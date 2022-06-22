@@ -6,11 +6,7 @@ extend type Query {
 
     homeSliders(count: Int): [Slider!] @field(resolver: "Webkul\\GraphQLAPI\\Queries\\Shop\\Common\\HomePageQuery@getSliders")
 
-    advertisements: [Advertise] @field(resolver: "Webkul\\GraphQLAPI\\Queries\\Shop\\Common\\HomePageQuery@getAdvertisements")
-
     homeCategories(categoryId: Int, categorySlug: String): [Category!] @field(resolver: "Webkul\\GraphQLAPI\\Queries\\Shop\\Common\\HomePageQuery@getCategories")
-
-    velocityHeaderContent: [HeaderContent!] @field(resolver: "Webkul\\GraphQLAPI\\Queries\\Shop\\Common\\HomePageQuery@getvelocityMetaData")
 }
 
 type Advertise {

@@ -6,9 +6,7 @@ use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Webkul\Product\Repositories\ProductRepository;
 use Webkul\Product\Repositories\ProductFlatRepository;
 use Webkul\Core\Repositories\SliderRepository;
-use Webkul\Velocity\Repositories\VelocityMetadataRepository;
 use Webkul\Category\Repositories\CategoryRepository;
-use Webkul\Velocity\Repositories\ContentRepository;
 use Webkul\Customer\Repositories\WishlistRepository;
 use Cart;
 use Elasticsearch\Endpoints\Cluster\Reroute;
@@ -37,26 +35,12 @@ class HomePageQuery extends BaseFilter
      */
     protected $sliderRepository;
 
-    /**
-     * ProductFlatRepository object
-     *
-     * @var \Webkul\Velocity\Repositories\VelocityMetadataRepository
-     */
-    protected $velocityMetadataRepository;
-
      /**
      * CategoryRepository object
      *
      * @var \Webkul\Category\Repositories\CategoryRepository
      */
     protected $categoryRepository;
-
-    /**
-     * ContentRepository object
-     *
-     * @var \Webkul\Velocity\Repositories\ContentRepository
-     */
-    protected $contentRepository;
 
      /**
      * ContentRepository object
@@ -71,9 +55,7 @@ class HomePageQuery extends BaseFilter
      * @param  \Webkul\Product\Repositories\ProductRepository  $productRepository
      * @param  \Webkul\Product\Repositories\ProductFlatRepository  $productFlatRepository
      * @param  \Webkul\Core\Repositories\SliderRepository $sliderRepository
-     * @param  \Webkul\Velocity\Repositories\VelocityMetadataRepository $velocityMetadataRepository
      * @param  \Webkul\Category\Repositories\CategoryRepository $categoryRepository
-     * @param  \Webkul\Velocity\Repositories\ContentRepository $contentRepository
      * @param  \Webkul\Customer\Repositories\WishlistRepository $wishlistRepository
     * @return void
      */
@@ -81,9 +63,7 @@ class HomePageQuery extends BaseFilter
         ProductRepository $productRepository,
         ProductFlatRepository $productFlatRepository,
         SliderRepository $sliderRepository,
-        VelocityMetadataRepository $velocityMetadataRepository,
         CategoryRepository $categoryRepository,
-        ContentRepository $contentRepository,
         WishlistRepository $wishlistRepository
     )
     {
@@ -93,11 +73,7 @@ class HomePageQuery extends BaseFilter
 
         $this->sliderRepository = $sliderRepository;
 
-        $this->velocityMetadataRepository = $velocityMetadataRepository;
-
         $this->categoryRepository = $categoryRepository;
-
-        $this->contentRepository  = $contentRepository;
 
         $this->wishlistRepository = $wishlistRepository;
     }
@@ -123,7 +99,7 @@ class HomePageQuery extends BaseFilter
                 ->inRandomOrder();
         })->paginate($count);
 
-        return $results;      
+        return $results;
     }
 
     public function getFeaturedProducts($rootValue, array $args, GraphQLContext $context){
@@ -147,30 +123,19 @@ class HomePageQuery extends BaseFilter
                 ->inRandomOrder();
         })->paginate($count);
 
-        return $results;      
+        return $results;
     }
 
     public function getSliders($rootValue, array $args, GraphQLContext $context) {
 
-        return $this->sliderRepository->latest()->get();      
+        return $this->sliderRepository->latest()->get();
     }
 
-    public function getAdvertisements($rootValue, array $args) {
+    public function getAdvertisements($rootValue, array $args)
+    {
+        $data = [];
 
-        $data= [];
-    
-       foreach($this->velocityMetadataRepository->latest()->get() as $keys => $metaData) {
-
-            $advertisement = json_decode($metaData->advertisement, true);
-
-            $data[$keys]["advertisementFour"] = $this->advertisement(4, $advertisement);
-
-            $data[$keys]["advertisementThree"] = $this->advertisement(3, $advertisement);
-
-            $data[$keys]["advertisementTwo"] = $this->advertisement(2, $advertisement);
-       }
-      
-       return $data;
+        return $data;
     }
 
     public function getCategories($rootValue, array $args, GraphQLContext $context)
@@ -186,14 +151,10 @@ class HomePageQuery extends BaseFilter
 
             if (isset($category->id))
                 $categoryId = $category->id;
-                
+
         }
 
         return $this->categoryRepository->getVisibleCategoryTree($categoryId);
-    }
-
-    public function getvelocityMetaData($rootValue, array $args, GraphQLContext $context) {
-        return $this->contentRepository->latest()->get();
     }
 
     public function advertisement($type, $advertisement) {

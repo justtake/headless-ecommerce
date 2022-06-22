@@ -47,11 +47,11 @@ class CartMutation extends Controller
         $this->guard = 'api';
 
         auth()->setDefaultDriver($this->guard);
-        
+
         $this->middleware('auth:' . $this->guard);
-        
+
         $this->cartRepository = $cartRepository;
-        
+
         $this->productRepository = $productRepository;
     }
 
@@ -81,7 +81,7 @@ class CartMutation extends Controller
         try {
             $cart = Cart::getCart();
 
-            return $cart->items;
+            return $cart ? $cart->items : [];
         } catch (Exception $e) {
             throw new Exception($e->getMessage());
         }
@@ -103,14 +103,14 @@ class CartMutation extends Controller
         if (! isset($data['product_id']) || (isset($data['product_id']) && !$data['product_id'])) {
             throw new Exception(trans('bagisto_graphql::app.admin.response.error-invalid-parameter'));
         }
-        
+
         try {
             $product = $this->productRepository->findOrFail($data['product_id']);
 
             $data = bagisto_graphql()->manageInputForCart($product, $data);
-            
+
             $cart = Cart::addProduct($data['product_id'], $data);
-        
+
             if ( isset($cart->id)) {
                 return [
                     'status'    => true,
@@ -142,7 +142,7 @@ class CartMutation extends Controller
         if (! isset($data['qty']) || (isset($data['qty']) && !$data['qty'])) {
             throw new Exception(trans('bagisto_graphql::app.admin.response.error-invalid-parameter'));
         }
-        
+
         try {
             $qty = [];
             foreach ($data['qty'] as $item) {
@@ -153,7 +153,7 @@ class CartMutation extends Controller
             $data['qty'] = $qty;
 
             $cart = Cart::updateItems($data);
-            
+
             if ( $cart == true) {
                 return [
                     'status'    => true,
@@ -181,10 +181,10 @@ class CartMutation extends Controller
         }
 
         $cartItemId = $args['id'];
-        
+
         try {
             $cart = Cart::removeItem($cartItemId);
-            
+
             if ( $cart == true) {
                 return [
                     'status'    => true,
@@ -212,10 +212,10 @@ class CartMutation extends Controller
         }
 
         $cartItemId = $args['id'];
-        
+
         try {
             $cart = Cart::moveToWishlist($cartItemId);
-            
+
             if ( $cart == true) {
                 return [
                     'status'    => true,
